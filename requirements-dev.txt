@@ -1,0 +1,4 @@
+yahoo-oauth==1.0
+xmltodict==0.12
+requests
+beautifulsoup4
