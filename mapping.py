@@ -8,13 +8,34 @@ def mapping():
             "Ret TD": {"table": "Kick Return", "column": "TD"},
             "2-PT": {},  # dunno where this is
             "Fum Lost": {"table": "Fumbles", "column": "LOST"},
-            "FG 0-19": {"table": "Kicking", "column": "1-19"},  # completed-attempted
-            "FG 20-29": {"table": "Kicking", "column": "20-29"},  # completed-attempted
-            "FG 30-39": {"table": "Kicking", "column": "30-39"},  # completed-attempted
-            "FG 40-49": {"table": "Kicking", "column": "40-49"},  # completed-attempted
-            "FG 50+": {"table": "Kicking", "column": "50+"},  # completed-attempted
+            "FG 0-19": {
+                "table": "Kicking",
+                "column": "1-19",
+                "parse": lambda x: x[: x.index("-")],
+            },  # completed-attempted
+            "FG 20-29": {
+                "table": "Kicking",
+                "column": "20-29",
+                "parse": lambda x: x[: x.index("-")],
+            },  # completed-attempted
+            "FG 30-39": {
+                "table": "Kicking",
+                "column": "30-39",
+                "parse": lambda x: x[: x.index("-")],
+            },  # completed-attempted
+            "FG 40-49": {
+                "table": "Kicking",
+                "column": "40-49",
+                "parse": lambda x: x[: x.index("-")],
+            },  # completed-attempted
+            "FG 50+": {
+                "table": "Kicking",
+                "column": "50+",
+                "parse": lambda x: x[: x.index("-")],
+            },  # completed-attempted
             "PAT Made": {},  # dunno where this is
             "Pass Yds": {"table": "Passing", "column": "YDS"},
+            "Pass TD": {"table": "Passing", "column": "TD"},
             "Fum Ret TD": {"table": "Fumbles", "column": "OWN FR"},
             "Int": {"table": "Passing", "column": "INT"},
             "Rush Yds": {"table": "Rushing", "column": "YDS"},

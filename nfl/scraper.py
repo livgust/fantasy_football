@@ -1,20 +1,24 @@
 from bs4 import BeautifulSoup
 import requests
-import pprint
+import json
+import os.path
 
 
 def get_player_stats(first_name, last_name):  # names are LC
     stats = {}
 
+    complete_name = (
+        first_name.lower().replace(" ", "-") + "-" + last_name.lower().replace(" ", "-")
+    )
+    file_name = "./cache_stats/individual/" + complete_name + ".json"
+
+    if os.path.isfile(file_name):
+        with open(file_name) as file:
+            return json.load(file)
+
     base_url = "https://www.nfl.com/players/"
     end_url = "/stats/"
-    complete_url = (
-        base_url
-        + first_name.lower().replace(" ", "-")
-        + "-"
-        + last_name.lower().replace(" ", "-")
-        + end_url
-    )
+    complete_url = base_url + complete_name + end_url
     page = requests.get(complete_url)
     soup = BeautifulSoup(page.content)
 
@@ -44,6 +48,9 @@ def get_player_stats(first_name, last_name):  # names are LC
                         row_dict[headers[index]] = data
                 stats[table_title][year] = row_dict
 
+    os.makedirs(os.path.dirname(file_name), exist_ok=True)
+    with open(file_name, "w") as outfile:
+        json.dump(stats, outfile)
     # table_name
     #   year
     #     stat: value
@@ -53,10 +60,16 @@ def get_player_stats(first_name, last_name):  # names are LC
 
 def get_team_stats(team_name):  # team name is LC with dashes
     stats = {}
+    formatted_team_name = team_name.lower().replace(" ", "-")
+    file_name = "./cache_stats/individual/" + formatted_team_name + ".json"
+
+    if os.path.isfile(file_name):
+        with open(file_name) as file:
+            return json.load(file)
 
     base_url = "https://www.nfl.com/teams/"
     end_url = "/stats/"
-    complete_url = base_url + team_name.lower().replace(" ", "-") + end_url
+    complete_url = base_url + formatted_team_name + end_url
     page = requests.get(complete_url)
     soup = BeautifulSoup(page.content)
 
@@ -73,6 +86,7 @@ def get_team_stats(team_name):  # team name is LC with dashes
         stats[label] = li.find(class_="nfl-o-team-h2h-stats__value").get_text(
             strip=True
         )
-
-    pprint.pprint(stats)
+    os.makedirs(os.path.dirname(file_name), exist_ok=True)
+    with open(file_name, "w") as outfile:
+        json.dump(stats, outfile)
     return stats

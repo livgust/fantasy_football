@@ -54,6 +54,8 @@ def rank_players(oauth, league_id, position, scoring, debug=0):
                     .get("2019", {})
                     .get(map_piece["column"])
                 )
+                if stat and "parse" in map_piece:  # specially parse out the stat
+                    stat = map_piece["parse"](stat)
                 if stat:
                     if debug == 3:
                         print("  stat is " + stat)
