@@ -8,7 +8,13 @@ def get_player_stats(first_name, last_name):  # names are LC
 
     base_url = "https://www.nfl.com/players/"
     end_url = "/stats/"
-    complete_url = base_url + first_name + "-" + last_name + end_url
+    complete_url = (
+        base_url
+        + first_name.lower().replace(" ", "-")
+        + "-"
+        + last_name.lower().replace(" ", "-")
+        + end_url
+    )
     page = requests.get(complete_url)
     soup = BeautifulSoup(page.content)
 
@@ -50,7 +56,7 @@ def get_team_stats(team_name):  # team name is LC with dashes
 
     base_url = "https://www.nfl.com/teams/"
     end_url = "/stats/"
-    complete_url = base_url + team_name + end_url
+    complete_url = base_url + team_name.lower().replace(" ", "-") + end_url
     page = requests.get(complete_url)
     soup = BeautifulSoup(page.content)
 

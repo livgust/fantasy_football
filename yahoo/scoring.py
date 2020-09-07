@@ -16,19 +16,22 @@ def scoring(stats):
     for modifier in modifiers:
         grouped_modifiers[modifier["stat_id"]] = modifier["value"]
 
-    complete_stats = {}
+    complete_stats = []
     for category in categories:
         if category["enabled"] and not (  # if enabled and not a display stat
             "is_only_display_stat" in category and category["is_only_display_stat"]
         ):
-            complete_stats[category["stat_id"]] = {
-                "name": category["name"],
-                "display_name": category["display_name"],
-                "position_type": category["position_type"],
-                "value": grouped_modifiers[str(category["stat_id"])],
-            }
+            complete_stats.append(
+                {
+                    "id": category["stat_id"],
+                    "name": category["name"],
+                    "display_name": category["display_name"],
+                    "position_type": category["position_type"],
+                    "value": grouped_modifiers[str(category["stat_id"])],
+                }
+            )
 
-    # id
+    #   id
     #   display_name
     #   name
     #   position_type
