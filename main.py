@@ -22,8 +22,7 @@ league_scoring = scoring(settings)
 # for each position, get list of possible players and rank by points
 final_rankings = {}
 
-# TODO: can't fetch W/R/T
-# TODO: there's a stat for kickers that has a dash in it
+# TODO: can't fetch W/R/T -> WR RB TE
 for position in roster_positions:
     if (position["position"] == "IR") or (position["position"] == "BN"):
         continue

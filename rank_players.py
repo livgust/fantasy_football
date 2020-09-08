@@ -11,8 +11,13 @@ def rank_players(oauth, league_id, position, scoring, debug=0):
     if debug == 2:
         print("Ranking players of position " + position_code)
     try:
+        position_query = (
+            "position=" + position_code
+            if position_code != "W/R/T"
+            else "position=WR;position=TE;position=RB"
+        )
         players = make_request(
-            oauth, "league/" + league_id + "/players;status=A;position=" + position_code
+            oauth, "league/" + league_id + "/players;status=A;" + position_query
         )["league"]["players"]["player"]
     except:
         if debug:

@@ -3,6 +3,8 @@ import requests
 import json
 import os.path
 
+import pprint
+
 
 def get_player_stats(first_name, last_name):  # names are LC
     stats = {}
@@ -58,10 +60,11 @@ def get_player_stats(first_name, last_name):  # names are LC
     return stats
 
 
-def get_team_stats(team_name):  # team name is LC with dashes
+def get_team_stats(team_name, team_abbr):  # team name is LC with dashes
     stats = {}
     formatted_team_name = team_name.lower().replace(" ", "-")
-    file_name = "./cache_stats/individual/" + formatted_team_name + ".json"
+    file_name = "./cache_stats/team/" + formatted_team_name + ".json"
+    formatted_team_abbr = team_abbr.lower()
 
     if os.path.isfile(file_name):
         with open(file_name) as file:
@@ -75,7 +78,6 @@ def get_team_stats(team_name):  # team name is LC with dashes
 
     li_stats = soup.find("div", class_="nfl-c-team-stats").find_all("li")
     for li in li_stats:
-        # TODO: FIRST DOWNS, PASSING, OFFENSE, RUSHING, TOUCHDOWNS(),
         label = ""
         if li.find(class_="nfl-o-team-h2h-stats__label--full"):
             label = li.find(class_="nfl-o-team-h2h-stats__label--full").get_text(
@@ -83,9 +85,33 @@ def get_team_stats(team_name):  # team name is LC with dashes
             )
         else:
             label = li.find(class_="nfl-o-team-h2h-stats__label").get_text(strip=True)
+
+        # some labels should return arrays as they contain multiple stats
+        if label == "TOUCHDOWNSRushingPassingReturnsDefensive":
+            stats[label] = list(
+                map(
+                    lambda x: x.get_text(strip=True),
+                    li.find(class_="nfl-o-team-h2h-stats__value").find_all("span"),
+                )
+            )
         stats[label] = li.find(class_="nfl-o-team-h2h-stats__value").get_text(
             strip=True
         )
+
+    supp_page = requests.get(
+        "https://www.espn.com/nfl/team/stats/_/type/team/name/" + formatted_team_abbr
+    )
+    supp_soup = BeautifulSoup(supp_page.content)
+    supp_metrics = ["Total Points Per Game", "Interceptions", "Fumbles-Lost"]
+    for supp_metric in supp_metrics:
+        index = supp_soup.find("tr", string=supp_metric).get("data-idx")
+        raw_value = (
+            supp_soup.find_all(attrs={"data-idx": index})[-1]
+            .find_all("td")[-1]
+            .get_text(strip=True)
+        )
+        stats[supp_metric] = raw_value
+
     os.makedirs(os.path.dirname(file_name), exist_ok=True)
     with open(file_name, "w") as outfile:
         json.dump(stats, outfile)

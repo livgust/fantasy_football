@@ -33,7 +33,9 @@ def rank_defense(oauth, league_id, scoring, debug=0):
         #   year
         #     stat: value
         #     stat: value
-        stats = get_team_stats(team["editorial_team_full_name"])
+        stats = get_team_stats(
+            team["editorial_team_full_name"], team["editorial_team_abbr"]
+        )
         score = 0
         #   id
         #   display_name
@@ -48,6 +50,10 @@ def rank_defense(oauth, league_id, scoring, debug=0):
             # pprint.pprint(map_piece)
             if map_piece:
                 stat = stats.get(map_piece["column"], {})
+                if (
+                    stat and "parse" in map_piece
+                ):  # need to specially parse out this stat
+                    stat = map_piece["parse"](stat)
                 if stat:
                     if debug == 3:
                         print("  stat is " + stat)
