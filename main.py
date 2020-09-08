@@ -3,7 +3,7 @@ from yahoo.scoring import scoring
 from yahoo.api import get_settings
 from rank_players import rank_players
 from rank_defense import rank_defense
-import pprint
+import json
 
 league_id = "nfl.l.871073"
 
@@ -22,21 +22,21 @@ league_scoring = scoring(settings)
 # for each position, get list of possible players and rank by points
 final_rankings = {}
 
-# TODO: can't fetch W/R/T -> WR RB TE
 for position in roster_positions:
     if (position["position"] == "IR") or (position["position"] == "BN"):
         continue
     elif position["position"] == "DEF":
         final_rankings[position["position"]] = {
             "count": position["count"],
-            "rankings": rank_defense(oauth, league_id, league_scoring, debug=2),
+            "rankings": rank_defense(oauth, league_id, league_scoring, debug=1),
         }
     else:
         final_rankings[position["position"]] = {
             "count": position["count"],
             "rankings": rank_players(
-                oauth, league_id, position, league_scoring, debug=2
+                oauth, league_id, position, league_scoring, debug=1
             ),
         }
-pprint.pprint(final_rankings)
 
+with open("out.json", "w") as outfile:
+    json.dump(final_rankings, outfile, indent=4)

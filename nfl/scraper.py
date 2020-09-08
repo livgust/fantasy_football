@@ -65,6 +65,8 @@ def get_team_stats(team_name, team_abbr):  # team name is LC with dashes
     formatted_team_name = team_name.lower().replace(" ", "-")
     file_name = "./cache_stats/team/" + formatted_team_name + ".json"
     formatted_team_abbr = team_abbr.lower()
+    if formatted_team_abbr == "was":  # special case for Washington's ESPN page
+        formatted_team_abbr = "wsh"
 
     if os.path.isfile(file_name):
         with open(file_name) as file:
@@ -98,6 +100,7 @@ def get_team_stats(team_name, team_abbr):  # team name is LC with dashes
             strip=True
         )
 
+    print("fomratted team namE: " + formatted_team_abbr)
     supp_page = requests.get(
         "https://www.espn.com/nfl/team/stats/_/type/team/name/" + formatted_team_abbr
     )

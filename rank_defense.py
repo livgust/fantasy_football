@@ -9,12 +9,23 @@ def rank_defense(oauth, league_id, scoring, debug=0):
     position_type = "DT"
     position_code = "DEF"
     try:
-        teams = make_request(
-            oauth, "league/" + league_id + "/players;status=A;position=" + position_code
-        )["league"]["players"]["player"]
-    except:
+        req_count = 25
+        next_req_start = 0
+        teams = []
+        while req_count == 25:
+            url = "league/" + league_id + "/players;status=A;"
+            if next_req_start > 0:
+                url += "start=" + str(next_req_start) + ";"
+            url += "position=" + position_code
+            req = make_request(oauth, url)["league"]["players"]
+            req_count = int(req["@count"]) if req and "@count" in req else 0
+            if req_count:
+                teams.extend(req["player"])
+            next_req_start += req_count
+    except Exception as e:
         if debug:
-            print("Couldn't get teams")
+            print("Couldn't get teams: ")
+            print(e)
         return
     # score each (filter to the stats that matter. for each stat, do the 2019 calculation)
     relevant_scores = list(
@@ -27,7 +38,7 @@ def rank_defense(oauth, league_id, scoring, debug=0):
     # for each player, sum relevant scores
     scored_teams = []
     for team in teams:
-        if debug == 2:
+        if debug >= 2:
             print("Calculating for " + team["editorial_team_full_name"])
         # table_name
         #   year
@@ -56,24 +67,24 @@ def rank_defense(oauth, league_id, scoring, debug=0):
                     stat = map_piece["parse"](stat)
                 if stat:
                     if debug == 3:
-                        print("  stat is " + stat)
+                        print("  stat is " + str(stat))
                     # multiply and add
                     score += float(stat) * float(relevant_score["value"])
                 else:
-                    if debug:
+                    if debug >= 2:
                         print(
                             "  couldn't calculate stat for "
                             + relevant_score["display_name"]
                         )
             else:
-                if debug:
+                if debug >= 2:
                     print(
                         "  don't know how to translate "
                         + relevant_score["display_name"]
                     )
             if debug == 3:
                 print("  score is now " + str(score))
-        if debug == 2:
+        if debug >= 2:
             print("  done calculating.")
         scored_teams.append(
             {"team": team["editorial_team_full_name"], "score": score,}

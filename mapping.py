@@ -2,6 +2,7 @@ def mapping():
     number_of_games = 16
     return {
         "Individual": {
+            "Season Games": {"table": "ANY", "column": "G"},
             "Rush TD": {"table": "Rushing", "column": "TD"},
             "Rec": {"table": "Receiving", "column": "REC"},
             "Rec Yds": {"table": "Receiving", "column": "YDS"},
