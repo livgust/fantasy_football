@@ -45,7 +45,6 @@ def rank_players(oauth, league_id, position, scoring, debug=0):
 
     # for each player, sum relevant scores
     scored_players = []
-    # TODO: get rid of "JR" and "III," etc. Also make things like "J.J." change to "j-j"
     for player in players:
         if debug >= 2:
             print("Calculating for " + player["name"]["full"])
@@ -53,6 +52,7 @@ def rank_players(oauth, league_id, position, scoring, debug=0):
         #   year
         #     stat: value
         #     stat: value
+        last_name = player["name"]["last"]
         stats = get_player_stats(player["name"]["first"], player["name"]["last"])
         if not stats:
             if debug:

@@ -87,7 +87,10 @@ def rank_defense(oauth, league_id, scoring, debug=0):
         if debug >= 2:
             print("  done calculating.")
         scored_teams.append(
-            {"team": team["editorial_team_full_name"], "score": score,}
+            {
+                "team": team["editorial_team_full_name"],
+                "score": score / 16,
+            }  # assume 16 games
         )
 
     # return by total score

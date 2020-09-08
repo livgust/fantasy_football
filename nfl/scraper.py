@@ -9,9 +9,36 @@ import pprint
 def get_player_stats(first_name, last_name):  # names are LC
     stats = {}
 
-    complete_name = (
-        first_name.lower().replace(" ", "-") + "-" + last_name.lower().replace(" ", "-")
+    first_name = first_name.lower()
+    if first_name[-1] == ".":
+        first_name = first_name[:-1]
+    first_name = (
+        first_name.strip().replace(" ", "-").replace(".", "-").replace("'", "-")
     )
+
+    last_name = last_name.lower()
+    alternate_last_name = ""
+    if last_name[-1] == ".":
+        last_name = last_name[:-1]
+    if last_name[-2] == "jr" or last_name[-2] == "ii":
+        last_name = last_name[:-2]
+        alternate_last_name = last_name
+    if last_name[-3] == "iii":
+        last_name = last_name[:-3]
+        alternate_last_name = last_name
+    last_name = last_name.strip().replace(" ", "-").replace(".", "-").replace("'", "-")
+    first_name = (
+        first_name.strip().replace(" ", "-").replace(".", "-").replace("'", "-")
+    )
+    if alternate_last_name:
+        alternate_last_name = (
+            alternate_last_name.strip()
+            .replace(" ", "-")
+            .replace(".", "-")
+            .replace("'", "-")
+        )
+
+    complete_name = first_name + "-" + last_name
     file_name = "./cache_stats/individual/" + complete_name + ".json"
 
     if os.path.isfile(file_name):
@@ -25,6 +52,14 @@ def get_player_stats(first_name, last_name):  # names are LC
     soup = BeautifulSoup(page.content)
 
     tables = soup.find_all("div", class_="nfl-t-stats--table")
+
+    if not tables and alternate_last_name:
+        complete_name = first_name + "-" + alternate_last_name
+        complete_url = base_url + complete_name + end_url
+        page = requests.get(complete_url)
+        soup = BeautifulSoup(page.content)
+        tables = soup.find_all("div", class_="nfl-t-stats--table")
+
     for table in tables:
         child = table.find("div", class_="nfl-o-roster")
         if child:
